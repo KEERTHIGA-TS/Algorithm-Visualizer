@@ -11,11 +11,11 @@ import Categories from "./pages/Categories";
 import Category from "./pages/Category";
 import Visualizer from "./pages/Visualizer/Visualizer";
 import GraphVisualizer from "./pages/Visualizer/GraphVisualizer";
-import StackVisualizer from "./pages/Visualizer/Data Structures/StackVisualizer";
-import LinkedListVisualizer from "./pages/Visualizer/Data Structures/LinkedListVisualizer";
-import QueueVisualizer from "./pages/Visualizer/Data Structures/QueueVisualizer";
-import BinaryTreeVisualizer from "./pages/Visualizer/Data Structures/BinaryTreeVisualizer";
-import BinaryHeapVisualizer from "./pages/Visualizer/Data Structures/BinaryHeapVisualizer";
+import StackVisualizer from "./pages/Visualizer/DataStructures/StackVisualizer";
+import LinkedListVisualizer from "./pages/Visualizer/DataStructures/LinkedListVisualizer";
+import QueueVisualizer from "./pages/Visualizer/DataStructures/QueueVisualizer";
+import BinaryTreeVisualizer from "./pages/Visualizer/DataStructures/BinaryTreeVisualizer";
+import BinaryHeapVisualizer from "./pages/Visualizer/DataStructures/BinaryHeapVisualizer";
 import Navbar from "./components/Navbar";
 
 export default function App() {

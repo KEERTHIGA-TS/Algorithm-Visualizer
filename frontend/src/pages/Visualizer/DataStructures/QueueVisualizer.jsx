@@ -9,7 +9,7 @@ import PseudocodePanel from "../../../components/PseudocodePanel";
 import ComplexityPanel from "../../../components/ComplexityPanel";
 import ExplanationPanel from "../../../components/ExplanationPanel";
 
-import { generateDS, parseCustomInput } from "../../../utils/generateDs";
+import { generateDS, parseCustomInput } from "../../../utils/generateDS";
 import * as Queue from "../../../algorithms/structures/queue";
 
 export default function QueueVisualizer() {

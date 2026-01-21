@@ -1,23 +1,22 @@
-// src/pages/Visualizer/BinaryTreeVisualizer.jsx
+
+
+// src/pages/Visualizer/StackVisualizer.jsx
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useHistoryStore } from "../../../store/historyStore";
 
-
-import BinaryTreeCanvas from "../../../components/Canvas/Data Structures/BinaryTreeCanvas";
-import BinaryTreeControlPanel from "../../../components/ControlPanel/Data Structures/BinaryTreeControlPanel";
-import PseudocodePanel from "../../../components/PseudocodePanel";
+import StackCanvas from "../../../components/Canvas/Data Structures/StackCanvas";
+import StackControlPanel from "../../../components/ControlPanel/Data Structures/StackControlPanel";
 import ComplexityPanel from "../../../components/ComplexityPanel";
+import PseudocodePanel from "../../../components/PseudocodePanel";
 import ExplanationPanel from "../../../components/ExplanationPanel";
 
+import { generateDS, parseCustomInput } from "../../../utils/generateDS";
+import * as Stack from "../../../algorithms/structures/stack";
 
-import { generateDS, parseCustomInput } from "../../../utils/generateDs";
-import * as BinaryTree from "../../../algorithms/structures/binaryTree";
-
-
-export default function BinaryTreeVisualizer() {
+export default function StackVisualizer() {
     /* ================= STATE ================= */
-    const [structure, setStructure] = useState(generateDS("binarytree", 7));
+    const [structure, setStructure] = useState(generateDS("stack", 5));
     const [colors, setColors] = useState({});
     const [speed, setSpeed] = useState(200);
     const [input, setInput] = useState("");
@@ -28,20 +27,13 @@ export default function BinaryTreeVisualizer() {
     const [isRunning, setIsRunning] = useState(false);
     const [isReplayMode, setIsReplayMode] = useState(false);
 
-
     const [searchParams] = useSearchParams();
     const replayId = searchParams.get('replay');
     const { saveHistory, getHistoryForReplay } = useHistoryStore();
 
-
     /* ================= MODALS ================= */
-    const [showInsertModal, setShowInsertModal] = useState(false);
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [insertValue, setInsertValue] = useState("");
-    const [searchValue, setSearchValue] = useState("");
-    const [deleteValue, setDeleteValue] = useState("");
-
+    const [showPushModal, setShowPushModal] = useState(false);
+    const [pushValue, setPushValue] = useState("");
 
     /* ================= REFS ================= */
     const structureRef = useRef(structure);
@@ -53,28 +45,24 @@ export default function BinaryTreeVisualizer() {
     const replayOperationRef = useRef({ name: null, params: {} });
     const hasReplayedRef = useRef(false);
 
-
     useEffect(() => { structureRef.current = structure; }, [structure]);
     useEffect(() => { speedRef.current = speed; }, [speed]);
-
 
     // ✅ Load replay on mount
     useEffect(() => {
         if (replayId) {
             loadReplay(replayId);
         } else {
-            const s = generateDS("binarytree", 7);
+            const s = generateDS("stack", 5);
             setStructure(s);
             structureRef.current = s;
             initialStructureRef.current = [...s];
         }
     }, [replayId]);
 
-
     useEffect(() => {
         if (isReplayMode && !hasReplayedRef.current) {
             hasReplayedRef.current = true;
-
 
             const timer = setTimeout(() => {
                 triggerOperation(
@@ -83,70 +71,52 @@ export default function BinaryTreeVisualizer() {
                 );
             }, 1200);
 
-
             return () => clearTimeout(timer);
         }
     }, [isReplayMode]);
 
-
     /* ================= META ================= */
     const meta = {
-        name: "Binary Tree Operations",
-        description: "Hierarchical data structure with insert, search, and traversal operations.",
+        name: "Stack (LIFO)",
+        description: "Stack follows Last In, First Out principle. Elements are added/removed only from the TOP.",
         complexity: {
-            best: "O(log n)",
-            average: "O(log n)",
+            best: "O(1)",
+            average: "O(1)",
             worst: "O(n)",
             space: "O(n)",
         },
     };
 
-
     /* ================= HELPERS ================= */
-    // Add this helper function at the top of BinaryTreeVisualizer.jsx
-    const deepCloneTree = (arr) => {
-        if (!arr || arr.length === 0) return [];
-        return arr.map(node => ({
-            value: node.value,
-            left: node.left,
-            right: node.right
-        }));
-    };
     const incrementStep = useCallback(() => {
         stepCountRef.current += 1;
     }, []);
-
 
     const loadReplay = async (id) => {
         const history = await getHistoryForReplay(id);
         if (!history?.replayData) return;
 
-
         const { initialInput, operationParams } = history.replayData;
-        const replaySpeed = history.speed ?? 200;
-
+        const replaySpeed = history.speed ?? 200; // ✅ Load saved speed
 
         setStructure(initialInput);
         structureRef.current = initialInput;
         initialStructureRef.current = [...initialInput];
-
+        
+        // ✅ Set speed from replay
         setSpeed(replaySpeed);
         speedRef.current = replaySpeed;
 
-
         hasReplayedRef.current = false;
-
 
         replayOperationRef.current = {
             name: history.operation,
             params: operationParams || {}
         };
 
-
         setExplanation(`🔄 Replay loaded: ${history.algorithm.name} (${replaySpeed}ms speed)`);
         setIsReplayMode(true);
     };
-
 
     const resetUI = useCallback(() => {
         setColors({});
@@ -156,7 +126,6 @@ export default function BinaryTreeVisualizer() {
         setIsPaused(false);
     }, []);
 
-
     const runOperation = useCallback(
         async (op, params = {}, pseudo = [], operationName = "") => {
             if (isRunning) return;
@@ -164,13 +133,14 @@ export default function BinaryTreeVisualizer() {
             setIsRunning(true);
             resetUI();
             setCurrentPseudo(pseudo);
+            shouldStopRef.current = false;
             stepCountRef.current = 0;
 
             const startTime = Date.now();
 
             try {
                 await op({
-                    arr: deepCloneTree(structureRef.current),  // ✅ DEEP CLONE
+                    arr: [...structureRef.current],
                     setStructure,
                     setColors,
                     setExplanation,
@@ -188,7 +158,7 @@ export default function BinaryTreeVisualizer() {
                     operation: operationName,
                     steps: stepCountRef.current,
                     duration,
-                    speed: speed,
+                    speed: speed, // ✅ Log speed
                     replay: isReplayMode
                 });
 
@@ -197,14 +167,14 @@ export default function BinaryTreeVisualizer() {
                     await saveHistory({
                         category: "structures",
                         algorithm: {
-                            name: "Binary Tree",
-                            key: "binarytree",
+                            name: "Stack",
+                            key: "stack",
                         },
                         operation: operationName,
                         steps: stepCountRef.current,
                         duration,
                         arraySize: structureRef.current.length,
-                        speed: speed,
+                        speed: speed, // ✅ Save speed
                         replayData: {
                             initialInput: [...initialStructureRef.current],
                             operationParams: params,
@@ -217,156 +187,68 @@ export default function BinaryTreeVisualizer() {
                 setIsRunning(false);
             }
         },
-        [isRunning, resetUI, saveHistory, isReplayMode, speed]
+        [isRunning, resetUI, saveHistory, isReplayMode, speed] // ✅ Add speed dependency
     );
-
 
     // ✅ Helper to trigger operations programmatically
     const triggerOperation = (opName, params) => {
         const ops = {
-            insert: () => runOperation(BinaryTree.insertOp, params, BinaryTree.insertPseudo, "insert"),
-            delete: () => runOperation(BinaryTree.deleteOp, params, BinaryTree.deletePseudo, "delete"),
-            search: () => runOperation(BinaryTree.searchOp, params, BinaryTree.searchPseudo, "search"),
-            inorder: () => runOperation(BinaryTree.inorderOp, {}, BinaryTree.inorderPseudo, "inorder"),
-            preorder: () => runOperation(BinaryTree.preorderOp, {}, BinaryTree.preorderPseudo, "preorder"),
-            postorder: () => runOperation(BinaryTree.postorderOp, {}, BinaryTree.postorderPseudo, "postorder"),
-            findMin: () => runOperation(BinaryTree.findMinOp, {}, BinaryTree.findMinPseudo, "findMin"),
-            findMax: () => runOperation(BinaryTree.findMaxOp, {}, BinaryTree.findMaxPseudo, "findMax"),
+            push: () => runOperation(Stack.pushOp, params, Stack.pushPseudo, "push"),
+            pop: () => runOperation(Stack.popOp, {}, Stack.popPseudo, "pop"),
+            peek: () => runOperation(Stack.peekOp, {}, Stack.peekPseudo, "peek"),
+            isEmpty: () => runOperation(Stack.isEmptyOp, {}, Stack.isEmptyPseudo, "isEmpty"),
+            size: () => runOperation(Stack.sizeOp, {}, Stack.sizePseudo, "size"),
+            traverse: () => runOperation(Stack.traverseOp, {}, Stack.traversePseudo, "traverse"),
         };
-
 
         ops[opName]?.();
     };
-
 
     const togglePause = () => {
         pauseRef.current = !pauseRef.current;
         setIsPaused(pauseRef.current);
     };
 
-
     /* ================= ACTIONS ================= */
-    const insert = () => setShowInsertModal(true);
-    const handleInsertConfirm = () => {
-        const value = Number(insertValue);
+    const push = () => setShowPushModal(true);
+    const handlePush = () => {
+        const value = Number(pushValue);
         if (!isNaN(value)) {
-            // ✅ Save the state BEFORE the operation
-            initialStructureRef.current = [...structureRef.current];
-
-            runOperation(
-                BinaryTree.insertOp,
-                { value },
-                BinaryTree.insertPseudo,
-                "insert"
-            );
-            setShowInsertModal(false);
-            setInsertValue("");
+            runOperation(Stack.pushOp, { value }, Stack.pushPseudo, "push");
+            setShowPushModal(false);
+            setPushValue("");
         }
     };
 
-
-    const deleteNode = () => setShowDeleteModal(true);
-    const handleDeleteConfirm = () => {
-        const key = Number(deleteValue);
-        if (!isNaN(key)) {
-            // ✅ Save state before operation
-            initialStructureRef.current = [...structureRef.current];
-
-            runOperation(
-                BinaryTree.deleteOp,
-                { key },
-                BinaryTree.deletePseudo,
-                "delete"
-            );
-            setShowDeleteModal(false);
-            setDeleteValue("");
-        }
-    };
-
-
-    const search = () => setShowSearchModal(true);
-    const handleSearchConfirm = () => {
-        const key = Number(searchValue);
-        if (!isNaN(key)) {
-            initialStructureRef.current = [...structureRef.current];
-            runOperation(
-                BinaryTree.searchOp,
-                { key },
-                BinaryTree.searchPseudo,
-                "search"
-            );
-            setShowSearchModal(false);
-            setSearchValue("");
-        }
-    };
-
-
-    const inorder = () => runOperation(
-        BinaryTree.inorderOp,
-        {},
-        BinaryTree.inorderPseudo,
-        "inorder"
-    );
-
-
-    const preorder = () => runOperation(
-        BinaryTree.preorderOp,
-        {},
-        BinaryTree.preorderPseudo,
-        "preorder"
-    );
-
-
-    const postorder = () => runOperation(
-        BinaryTree.postorderOp,
-        {},
-        BinaryTree.postorderPseudo,
-        "postorder"
-    );
-
-
-    const findMin = () => runOperation(
-        BinaryTree.findMinOp,
-        {},
-        BinaryTree.findMinPseudo,
-        "findMin"
-    );
-
-
-    const findMax = () => runOperation(
-        BinaryTree.findMaxOp,
-        {},
-        BinaryTree.findMaxPseudo,
-        "findMax"
-    );
-
+    const pop = () => runOperation(Stack.popOp, {}, Stack.popPseudo, "pop");
+    const peek = () => runOperation(Stack.peekOp, {}, Stack.peekPseudo, "peek");
+    const isEmpty = () => runOperation(Stack.isEmptyOp, {}, Stack.isEmptyPseudo, "isEmpty");
+    const size = () => runOperation(Stack.sizeOp, {}, Stack.sizePseudo, "size");
+    const traverse = () => runOperation(Stack.traverseOp, {}, Stack.traversePseudo, "traverse");
 
     const generate = () => {
         if (isReplayMode) return;
 
-        const s = generateDS("binarytree", 7);
+        const s = generateDS("stack", 5);
         setStructure(s);
         structureRef.current = s;
-        initialStructureRef.current = [...s]; // ✅ This is correct
-        setExplanation("🆕 New binary tree generated");
+        initialStructureRef.current = [...s];
+        setExplanation("🆕 New stack generated");
     };
-
 
     const useInput = () => {
         if (isReplayMode) return;
 
-
         try {
-            const s = parseCustomInput(input, "binarytree");
+            const s = parseCustomInput(input, "stack");
             setStructure(s);
             structureRef.current = s;
-            initialStructureRef.current = [...s]; // ✅ FIXED: Update initial state
-            setExplanation("✅ Custom input applied");
+            initialStructureRef.current = [...s];
+            setExplanation("✅ Custom stack applied");
         } catch {
             setExplanation("❌ Invalid input");
         }
     };
-
 
     /* ================= MODAL ================= */
     const Modal = ({ title, isOpen, onConfirm, onCancel, children }) => {
@@ -395,75 +277,30 @@ export default function BinaryTreeVisualizer() {
         );
     };
 
-
     /* ================= RENDER ================= */
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black text-white px-6 py-8">
-            {/* ===== INSERT MODAL ===== */}
+            {/* ===== PUSH MODAL ===== */}
             <Modal
-                title="➕ Insert Node"
-                isOpen={showInsertModal}
-                onConfirm={handleInsertConfirm}
+                title="⬆️ Push to Stack"
+                isOpen={showPushModal}
+                onConfirm={handlePush}
                 onCancel={() => {
-                    setShowInsertModal(false);
-                    setInsertValue("");
+                    setShowPushModal(false);
+                    setPushValue("");
                 }}
             >
                 <input
                     type="number"
-                    value={insertValue}
-                    onChange={(e) => setInsertValue(e.target.value)}
+                    value={pushValue}
+                    onChange={(e) => setPushValue(e.target.value)}
                     className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-400"
                     placeholder="Value (1-99)"
                     min="1"
                     max="99"
-                    autoFocus
                 />
-                <div className="text-xs text-gray-400">Tree size: {structure.length}</div>
+                <div className="text-xs text-gray-400">Current size: {structure.length}</div>
             </Modal>
-
-
-            {/* ===== DELETE MODAL ===== */}
-            <Modal
-                title="🗑️ Delete Node"
-                isOpen={showDeleteModal}
-                onConfirm={handleDeleteConfirm}
-                onCancel={() => {
-                    setShowDeleteModal(false);
-                    setDeleteValue("");
-                }}
-            >
-                <input
-                    type="number"
-                    value={deleteValue}
-                    onChange={(e) => setDeleteValue(e.target.value)}
-                    className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-400"
-                    placeholder="Value to delete"
-                />
-                <div className="text-xs text-gray-400">Tree size: {structure.length}</div>
-            </Modal>
-
-
-            {/* ===== SEARCH MODAL ===== */}
-            <Modal
-                title="🔍 Search Node"
-                isOpen={showSearchModal}
-                onConfirm={handleSearchConfirm}
-                onCancel={() => {
-                    setShowSearchModal(false);
-                    setSearchValue("");
-                }}
-            >
-                <input
-                    type="number"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-400"
-                    placeholder="Search value"
-                    autoFocus
-                />
-            </Modal>
-
 
             {/* ===== MAIN LAYOUT ===== */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -478,32 +315,27 @@ export default function BinaryTreeVisualizer() {
                             </div>
                         )}
                         <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                            🌲 {meta.name}
+                            {meta.name}
                         </h1>
                         <p className="text-gray-300 mb-6 leading-relaxed">{meta.description}</p>
                         <ComplexityPanel data={meta.complexity} />
                     </div>
 
-
                     <div className="bg-black/40 rounded-2xl p-8 backdrop-blur border border-white/10">
-                        <BinaryTreeCanvas structure={structure} colors={colors} />
+                        <StackCanvas structure={structure} colors={colors} />
                     </div>
-
 
                     <ExplanationPanel text={explanation} />
                 </div>
 
-
                 <div className="lg:col-span-2 flex flex-col gap-6">
-                    <BinaryTreeControlPanel
-                        insert={insert}
-                        deleteNode={deleteNode}
-                        search={search}
-                        inorder={inorder}
-                        preorder={preorder}
-                        postorder={postorder}
-                        findMin={findMin}
-                        findMax={findMax}
+                    <StackControlPanel
+                        push={push}
+                        pop={pop}
+                        peek={peek}
+                        isEmpty={isEmpty}
+                        traverse={traverse}
+                        size={size}
                         togglePause={togglePause}
                         isPaused={isPaused}
                         isRunning={isRunning}
@@ -516,7 +348,6 @@ export default function BinaryTreeVisualizer() {
                         nodeCount={structure.length}
                         isReplayMode={isReplayMode}
                     />
-
 
                     <PseudocodePanel code={currentPseudo} currentLine={currentLine} />
                 </div>
