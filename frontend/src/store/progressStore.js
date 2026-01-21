@@ -5,7 +5,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { useAuthStore } from "./authStore";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
 
 export const useProgressStore = create((set) => ({
   // State
