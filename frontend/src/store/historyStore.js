@@ -26,10 +26,10 @@ export const useHistoryStore = create((set, get) => ({
     
     try {
       const [resRecent, resStats] = await Promise.all([
-        axios.get(`${API_URL}/history/recent`, {
+        axios.get(`${API_URL}/recent`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`${API_URL}/history/stats`, {
+        axios.get(`${API_URL}/stats`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -56,7 +56,7 @@ export const useHistoryStore = create((set, get) => ({
     set({ loading: true, error: null });
     
     try {
-      const res = await axios.get(`${API_URL}/history/${id}`, {
+      const res = await axios.get(`${API_URL}/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -80,7 +80,7 @@ export const useHistoryStore = create((set, get) => ({
     const token = useAuthStore.getState().token;
     
     try {
-      await axios.post(`${API_URL}/history`, historyData, {
+      await axios.post(`${API_URL}`, historyData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
