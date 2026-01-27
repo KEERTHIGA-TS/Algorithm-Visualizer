@@ -9,10 +9,20 @@ import historyRoutes from './routes/historyRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
 
 const app = express();
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173'
+];
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
@@ -25,9 +35,9 @@ app.use('/api/progress', progressRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString() 
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -39,7 +49,7 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
