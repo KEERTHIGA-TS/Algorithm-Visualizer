@@ -42,8 +42,6 @@ Built to help developers and students deeply understand how algorithms work — 
 
 # 🛠 Tech Stack
 
-## 🛠 Tech Stack
-
 **Frontend:** React.js, HTML, CSS, JavaScript, React Router  
 **Backend:** Node.js, Express.js  
 **Database:** MongoDB  
@@ -53,12 +51,13 @@ Built to help developers and students deeply understand how algorithms work — 
 **Charts & Visualization:** Recharts  
 **Animations:** Framer Motion  
 **Build Tool:** Vite  
+
 ---
 
 # 🌐 Live Demo
 
 🔗 **Live Application:**  
-👉 https://your-live-demo-link.com
+👉 https://algorithm-visualizer-frontend-o25o.onrender.com/
 
 ---
 
@@ -69,7 +68,13 @@ Built to help developers and students deeply understand how algorithms work — 
 ```markdown
 ![Home Page](screenshots/home.png)
 ```
+---
 
+## 📊 Login Page
+
+```markdown
+![Sorting Visualization](screenshots/login.png)
+```
 ---
 
 ## 📊 Sorting Visualization
