@@ -42,35 +42,17 @@ Built to help developers and students deeply understand how algorithms work — 
 
 # 🛠 Tech Stack
 
-## 💻 Frontend
+## 🛠 Tech Stack
 
-| Tool | Purpose |
-|------|----------|
-| **React 19** | UI framework |
-| **Vite 7** | Build tool & dev server |
-| **React Router DOM v7** | Client-side routing |
-| **Zustand** | Global state management (auth, history, progress) |
-| **Tailwind CSS v3** | Utility-first styling |
-| **Framer Motion** | Animations |
-| **Recharts** | Dashboard bar charts |
-| **Axios** | HTTP client |
-| **Heroicons** | Icon library |
-
----
-
-## 🖥 Backend
-
-| Tool | Purpose |
-|------|----------|
-| **Node.js + Express 5** | REST API server |
-| **MongoDB + Mongoose** | Database & ODM |
-| **bcryptjs** | Password hashing |
-| **JSON Web Token (JWT)** | Authentication tokens |
-| **cookie-parser** | Cookie handling |
-| **express-rate-limit** | API rate limiting |
-| **dotenv** | Environment variable management |
-| **cors** | Cross-origin request handling |
-
+**Frontend:** React.js, HTML, CSS, JavaScript, React Router  
+**Backend:** Node.js, Express.js  
+**Database:** MongoDB  
+**Authentication:** JWT  
+**State Management:** Zustand  
+**Styling:** Tailwind CSS  
+**Charts & Visualization:** Recharts  
+**Animations:** Framer Motion  
+**Build Tool:** Vite  
 ---
 
 # 🌐 Live Demo
