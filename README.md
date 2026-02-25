@@ -63,54 +63,27 @@ Built to help developers and students deeply understand how algorithms work — 
 
 # 📸 Screenshots
 
-## 🏠 Home Page
-
-```markdown
+## Home Page
 ![Home Page](screenshots/home.png)
-```
----
 
-## 📊 Login Page
+## Login Page
+![Login](screenshots/login.png)
 
-```markdown
-![Sorting Visualization](screenshots/login.png)
-```
----
-
-## 📊 Sorting Visualization
-
-```markdown
-![Sorting Visualization](screenshots/sorting.png)
-```
-
----
-
-## 🌐 Graph Visualization
-
-```markdown
-![Graph Visualization](screenshots/graph.png)
-```
-
----
-
-## 📚 Pseudocode & Complexity Panel
-
-```markdown
-![Pseudocode Panel](screenshots/pseudocode.png)
-```
-
----
-
-## 📈 Dashboard (Progress & History)
-
-```markdown
+## Dashboard (Progress & History)
 ![Dashboard](screenshots/dashboard.png)
-```
 
----
+## Categories
+![Dashboard](screenshots/categories.png)
 
-## 🔄 Replay Visualization
+## Sorting Visualization
+![Sorting Visualization](screenshots/bubble-sort.png)
 
-```markdown
+## Graph Visualization
+![Graph Visualization](screenshots/BFS.png)
+
+## Data Structure Visualization
+![Data Structure Visualization](screenshots/binary-tree.png)
+
+## Replay Visualization
 ![Replay Feature](screenshots/replay.png)
-```
+
