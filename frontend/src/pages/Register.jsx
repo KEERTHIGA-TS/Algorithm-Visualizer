@@ -54,7 +54,7 @@ export default function Register() {
         e.preventDefault();
         if (!isValid) return;
         const success = await register(form.name, form.email, form.password);
-        if (success) navigate("/login");
+        if (success) navigate("/dashboard");
     };
 
     return (
