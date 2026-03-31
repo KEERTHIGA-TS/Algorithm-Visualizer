@@ -84,7 +84,11 @@ export default function ControlPanel({
                     min="5"
                     max="100"
                     value={size}
-                    onChange={(e) => setSize(Number(e.target.value))}
+                    onChange={(e) => {
+                        const newSize = Number(e.target.value);
+                        setSize(newSize);
+                        generate(newSize); // 🔥 THIS LINE FIXES IT
+                    }}
                     disabled={isDisabled}
                     className={`w-full transition-all rounded-lg appearance-none h-2 ${
                         isDisabled
